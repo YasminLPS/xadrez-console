@@ -5,7 +5,7 @@ namespace tabuleiro
     {
         public int linhas { get; set; }
         public int colunas { get; set; }
-        public Piece[,] pecas;
+        private Piece[,] pecas;
 
         public Tabuleiro(int linhas, int colunas)
         {
@@ -14,6 +14,10 @@ namespace tabuleiro
             pecas = new Piece[linhas, colunas];
         }
 
+        public Piece peca(int linha, int coluna) 
+        {
+            return pecas[linha, coluna];
+        }
 
     }
 }
