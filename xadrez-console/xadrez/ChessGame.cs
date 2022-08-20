@@ -7,8 +7,8 @@ namespace xadrez
     class ChessGame
     {
         public Tabuleiro tab { get; private set; }
-        private int turno;
-        private Color jogadorAtual;
+        public int turno { get; private set; }
+        public Color jogadorAtual { get; private set; }
         public bool terminada { get; private set; }
 
         public ChessGame()
@@ -26,6 +26,50 @@ namespace xadrez
             p.incrementarQteMovimentos();
             Piece pecaCapturada = tab.retirarPeca(destino);
             tab.colocarPeca(p, destino);
+        }
+
+        public void realizaJogada(Position origem, Position destino) 
+        {
+            executaMovimento(origem, destino);
+            turno++;
+            mudaJogador();
+        }
+
+        private void mudaJogador() 
+        {
+            if (jogadorAtual == Color.Branca) 
+            {
+                jogadorAtual = Color.Preta;
+
+            }
+            else 
+            {
+                jogadorAtual = Color.Branca;
+            }
+        }
+
+        public void validarPosicaoDeOrigem(Position pos) 
+        {
+            if (tab.peca(pos) == null) 
+            {
+                throw new TabuleiroExecption("Nao existe peca na posicao de origem escolhida!");
+            }
+            if (jogadorAtual != tab.peca(pos).color) 
+            {
+                throw new TabuleiroExecption("A peça de origem escolhida nao e sua!");
+            }
+            if (!tab.peca(pos).existeMovimentosPossiveis()) 
+            {
+                throw new TabuleiroExecption("Nao ha movimentos possiveis para a peca de origem escolhida!");
+            }
+        }
+
+        public void validarPosicaoDeDestino(Position origem, Position destino) 
+        {
+            if (!tab.peca(origem).podeMoverPara(destino)) 
+            {
+                throw new TabuleiroExecption("Posicao de destino invalida!");
+            }
         }
 
         private void colocarPecas() 
