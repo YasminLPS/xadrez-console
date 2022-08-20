@@ -10,10 +10,15 @@ namespace tabuleiro
 
         public Piece(Tabuleiro tab, Color color) 
         {
-            this.position = null;
+            position = null;
             this.tab = tab;
             this.color = color;
-            this.qteMovimentos = 0;
+            qteMovimentos = 0;
         }
+
+        public void incrementarQteMovimentos() 
+        {
+             qteMovimentos++;
+        } 
     }
 }
