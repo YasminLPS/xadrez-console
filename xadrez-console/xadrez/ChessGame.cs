@@ -17,7 +17,7 @@ namespace xadrez
 
         public ChessGame()
         {
-            tab = new Tabuleiro(8,8);
+            tab = new Tabuleiro(8, 8);
             turno = 1;
             jogadorAtual = Color.Branca;
             terminada = false;
@@ -28,21 +28,21 @@ namespace xadrez
             colocarPecas();
         }
 
-        public Piece executaMovimento(Position origem, Position destino) 
+        public Piece executaMovimento(Position origem, Position destino)
         {
             Piece p = tab.retirarPeca(origem);
             p.incrementarQteMovimentos();
             Piece pecaCapturada = tab.retirarPeca(destino);
             tab.colocarPeca(p, destino);
-            if (pecaCapturada != null) 
+            if (pecaCapturada != null)
             {
                 capturadas.Add(pecaCapturada);
             }
 
             //#jogadaespecial roque pequeno
-            if (p is King && destino.coluna == origem.coluna +2) 
+            if (p is King && destino.coluna == origem.coluna + 2)
             {
-                Position origemT = new Position(origem.linha, origem.coluna +3);
+                Position origemT = new Position(origem.linha, origem.coluna + 3);
                 Position destinoT = new Position(origem.linha, origem.coluna + 1);
                 Piece T = tab.retirarPeca(origemT);
                 T.incrementarQteMovimentos();
@@ -52,7 +52,7 @@ namespace xadrez
             //#jogadaespecial roque grande
             if (p is King && destino.coluna == origem.coluna - 2)
             {
-                Position origemT = new Position(origem.linha, origem.coluna -4);
+                Position origemT = new Position(origem.linha, origem.coluna - 4);
                 Position destinoT = new Position(origem.linha, origem.coluna - 1);
                 Piece T = tab.retirarPeca(origemT);
                 T.incrementarQteMovimentos();
@@ -60,16 +60,16 @@ namespace xadrez
             }
 
             //#jogadaespecial en passant
-            if (p is Peao) 
+            if (p is Peao)
             {
-                if (origem.coluna != destino.coluna && pecaCapturada == null) 
+                if (origem.coluna != destino.coluna && pecaCapturada == null)
                 {
                     Position posP;
-                    if (p.color == Color.Branca)  
+                    if (p.color == Color.Branca)
                     {
                         posP = new Position(destino.linha + 1, destino.coluna);
                     }
-                    else 
+                    else
                     {
                         posP = new Position(destino.linha - 1, destino.coluna);
                     }
@@ -81,11 +81,11 @@ namespace xadrez
             return pecaCapturada;
         }
 
-        public void desfazMovimento(Position origem, Position destino, Piece pecaCapturada ) 
+        public void desfazMovimento(Position origem, Position destino, Piece pecaCapturada)
         {
             Piece p = tab.retirarPeca(destino);
             p.decrementarQteMovimentos();
-            if (pecaCapturada != null) 
+            if (pecaCapturada != null)
             {
                 tab.colocarPeca(pecaCapturada, destino);
                 capturadas.Remove(pecaCapturada);
@@ -104,7 +104,7 @@ namespace xadrez
             //#jogadaespecial roque grande
             if (p is King && destino.coluna == origem.coluna - 2)
             {
-                Position origemT = new Position(origem.linha, origem.coluna -4);
+                Position origemT = new Position(origem.linha, origem.coluna - 4);
                 Position destinoT = new Position(origem.linha, origem.coluna - 1);
                 Piece T = tab.retirarPeca(destinoT);
                 T.decrementarQteMovimentos();
@@ -112,19 +112,19 @@ namespace xadrez
             }
 
             //#jogadaespecial en passant
-            if (p is Peao) 
+            if (p is Peao)
             {
-                if (origem.coluna != destino.coluna && pecaCapturada == vulneravelEnPassant) 
+                if (origem.coluna != destino.coluna && pecaCapturada == vulneravelEnPassant)
                 {
                     Piece peao = tab.retirarPeca(destino);
                     Position posP;
-                    if (p.color == Color.Branca) 
+                    if (p.color == Color.Branca)
                     {
                         posP = new Position(3, destino.coluna);
                     }
-                    else 
+                    else
                     {
-                        posP = new Position(4 , destino.coluna); 
+                        posP = new Position(4, destino.coluna);
                     }
                     tab.colocarPeca(peao, posP);
                 }
@@ -142,11 +142,27 @@ namespace xadrez
                 throw new TabuleiroExecption("Voce nao pode se colocar em xeque!");
             }
 
+            Piece p = tab.peca(destino);
+
+            //#jogadaespecial promocao
+            if (p is Peao)
+            {
+                if (p.color == Color.Branca && destino.linha == 0 || (p.color == Color.Preta && destino.linha == 7))
+                {
+                    p = tab.retirarPeca(destino);
+                    pecas.Remove(p);
+                    Piece dama = new Dama(tab, p.color);
+                    tab.colocarPeca(dama, destino);
+                    pecas.Add(dama);
+                }
+            }
+
+
             if (estaEmXeque(adversaria(jogadorAtual)))
             {
                 xeque = true;
             }
-            else 
+            else
             {
                 xeque = false;
             }
@@ -160,10 +176,8 @@ namespace xadrez
                 mudaJogador();
             }
 
-            Piece p = tab.peca(destino);
-            
             //#jogadaespecial en passant
-            if (p is Peao && (destino.linha == origem.linha -2 || destino.linha == origem.linha + 2)) 
+            if (p is Peao && (destino.linha == origem.linha - 2 || destino.linha == origem.linha + 2))
             {
                 vulneravelEnPassant = p;
             }
@@ -173,57 +187,57 @@ namespace xadrez
             }
         }
 
-        private void mudaJogador() 
+        private void mudaJogador()
         {
-            if (jogadorAtual == Color.Branca) 
+            if (jogadorAtual == Color.Branca)
             {
                 jogadorAtual = Color.Preta;
 
             }
-            else 
+            else
             {
                 jogadorAtual = Color.Branca;
             }
         }
 
-        public void validarPosicaoDeOrigem(Position pos) 
+        public void validarPosicaoDeOrigem(Position pos)
         {
-            if (tab.peca(pos) == null) 
+            if (tab.peca(pos) == null)
             {
                 throw new TabuleiroExecption("Nao existe peca na posicao de origem escolhida!");
             }
-            if (jogadorAtual != tab.peca(pos).color) 
+            if (jogadorAtual != tab.peca(pos).color)
             {
                 throw new TabuleiroExecption("A peça de origem escolhida nao e sua!");
             }
-            if (!tab.peca(pos).existeMovimentosPossiveis()) 
+            if (!tab.peca(pos).existeMovimentosPossiveis())
             {
                 throw new TabuleiroExecption("Nao ha movimentos possiveis para a peca de origem escolhida!");
             }
         }
 
-        public void validarPosicaoDeDestino(Position origem, Position destino) 
+        public void validarPosicaoDeDestino(Position origem, Position destino)
         {
-            if (!tab.peca(origem).movimentoPossivel(destino)) 
+            if (!tab.peca(origem).movimentoPossivel(destino))
             {
                 throw new TabuleiroExecption("Posicao de destino invalida!");
             }
         }
 
-        public HashSet<Piece> pecasCapturadas(Color cor) 
+        public HashSet<Piece> pecasCapturadas(Color cor)
         {
             HashSet<Piece> aux = new HashSet<Piece>();
-            foreach (Piece x in capturadas) 
+            foreach (Piece x in capturadas)
             {
-                if (x.color == cor) 
+                if (x.color == cor)
                 {
-                   aux.Add(x);
+                    aux.Add(x);
                 }
             }
             return aux;
         }
 
-        public HashSet<Piece> pecasEmJogo(Color cor) 
+        public HashSet<Piece> pecasEmJogo(Color cor)
         {
             HashSet<Piece> aux = new HashSet<Piece>();
             foreach (Piece x in pecas)
@@ -237,23 +251,23 @@ namespace xadrez
             return aux;
         }
 
-        private Color adversaria(Color cor) 
+        private Color adversaria(Color cor)
         {
-            if (cor == Color.Branca) 
+            if (cor == Color.Branca)
             {
                 return Color.Preta;
             }
-            else 
+            else
             {
                 return Color.Branca;
             }
         }
 
-        private Piece rei(Color cor) 
+        private Piece rei(Color cor)
         {
-            foreach (Piece x in pecasEmJogo(cor)) 
+            foreach (Piece x in pecasEmJogo(cor))
             {
-                if (x is King) 
+                if (x is King)
                 {
                     return x;
                 }
@@ -261,18 +275,18 @@ namespace xadrez
             return null;
         }
 
-        public bool estaEmXeque(Color cor) 
+        public bool estaEmXeque(Color cor)
         {
             Piece R = rei(cor);
-            if (R == null) 
+            if (R == null)
             {
                 throw new TabuleiroExecption("Nao ha rei da cor " + cor + " no tabuleiro!");
             }
 
-            foreach (Piece x in pecasEmJogo(adversaria(cor))) 
+            foreach (Piece x in pecasEmJogo(adversaria(cor)))
             {
                 bool[,] matt = x.movimentosPossiveis();
-                if (matt[R.position.linha, R.position.coluna]) 
+                if (matt[R.position.linha, R.position.coluna])
                 {
                     return true;
                 }
@@ -280,27 +294,27 @@ namespace xadrez
             return false;
         }
 
-        public bool testeXequeMate(Color cor) 
+        public bool testeXequeMate(Color cor)
         {
-            if (!estaEmXeque(cor)) 
+            if (!estaEmXeque(cor))
             {
                 return false;
             }
-            foreach (Piece x in pecasEmJogo(cor)) 
+            foreach (Piece x in pecasEmJogo(cor))
             {
                 bool[,] mat = x.movimentosPossiveis();
-                for (int i = 0; i <tab.linhas; i++ ) 
+                for (int i = 0; i < tab.linhas; i++)
                 {
-                    for (int j = 0; j<tab.colunas; j++) 
+                    for (int j = 0; j < tab.colunas; j++)
                     {
-                        if (mat[i,j]) 
+                        if (mat[i, j])
                         {
                             Position origem = x.position;
                             Position destino = new Position(i, j);
                             Piece pecaCapturada = executaMovimento(origem, destino);
                             bool testeXeque = estaEmXeque(cor);
                             desfazMovimento(origem, destino, pecaCapturada);
-                            if (!testeXeque) 
+                            if (!testeXeque)
                             {
                                 return false;
                             }
@@ -311,13 +325,13 @@ namespace xadrez
             return true;
         }
 
-        public void colocarNovaPeca(char coluna, int linha, Piece peca) 
+        public void colocarNovaPeca(char coluna, int linha, Piece peca)
         {
             tab.colocarPeca(peca, new PosicaoXadrez(coluna, linha).toPosition());
             pecas.Add(peca);
         }
 
-        private void colocarPecas() 
+        private void colocarPecas()
         {
             colocarNovaPeca('a', 1, new Tower(tab, Color.Branca));
             colocarNovaPeca('b', 1, new Cavalo(tab, Color.Branca));
