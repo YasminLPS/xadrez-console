@@ -1,7 +1,7 @@
 ﻿
 namespace tabuleiro
 {
-    class Piece
+    abstract class Piece
     {
         public Position position { get; set; }
         public Color color { get; protected set; }
@@ -18,7 +18,10 @@ namespace tabuleiro
 
         public void incrementarQteMovimentos() 
         {
-             qteMovimentos++;
-        } 
+           qteMovimentos++;
+        }
+
+        public abstract bool[,] movimentosPossiveis();
+
     }
 }
